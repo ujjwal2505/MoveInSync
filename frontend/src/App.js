@@ -11,7 +11,11 @@ import "./App.css";
 
 function App() {
   const { user } = useContext(UserContext);
-  axios.defaults.baseURL = "http://localhost:8080";
+  console.log(process.env.NODE_ENV);
+  axios.defaults.baseURL =
+    process.env.NODE_ENV === "production"
+      ? window.location.origin
+      : "http://localhost:8080";
   axios.defaults.headers.userId = user.phoneNo;
 
   return (
