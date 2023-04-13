@@ -19,20 +19,26 @@ const client = require("twilio")(
 );
 
 app.post("/api/getcode", async (req, res) => {
-  const verification = await client.verify.v2
-    .services(process.env.VERIFY_SERVICE_SID)
-    .verifications.create({
-      to: `+91${req.body.phoneNo}`,
-      channel: req.body.channel,
-    });
-  if (verification.status == "pending") {
-    res.status(200).json({
-      success: true,
-      message: `OTP SENT to ${req.body.phoneNo}`,
+  try {
+    const verification = await client.verify.v2
+      .services(process.env.VERIFY_SERVICE_SID)
+      .verifications.create({
+        to: `+91${req.body.phoneNo}`,
+        channel: req.body.channel,
+      });
+    if (verification.status == "pending") {
+      res.status(200).json({
+        success: true,
+        message: `OTP SENT to ${req.body.phoneNo}`,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      success: false,
+      message: `Something went wrong`,
     });
   }
-
-  res;
 });
 
 app.post("/api/verifycode", async (req, res) => {
