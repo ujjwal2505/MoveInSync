@@ -1,0 +1,29 @@
+.map-search-bar {
+  padding: 4px;
+  padding-bottom: 0px;
+  .location-search-input {
+    padding: 10.5px 12px;
+    border: 1px solid #0000003b;
+    border-radius: 4px;
+    font-size: 16px;
+    width: 90%;
+  }
+}
+
+.autocomplete-dropdown-container {
+  margin: 4px;
+  margin-bottom: 8px;
+  //   border: 1px solid rgba(0, 0, 0, 0.23);
+  max-height: 100px;
+  overflow-y: scroll;
+
+  .suggestion-item {
+    padding: 3px;
+    font-size: 14px;
+    border: 1px solid #0000003b;
+
+    &--active {
+      background-color: #0000003b;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+.custom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.heading_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0;
+  font-size: 20px;
+  font-weight: 500;
+
+  .heading {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+}
+
+.garage-location {
+  display: flex;
+  flex-direction: column;
+  gap: 15px 0;
+
+  &_heading {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &_fields {
+    display: flex;
+    column-gap: 10px;
+  }
+}
+
+.MuiDialog-paperScrollPaper {
+  height: 80%;
+  width: 90%;
+  margin: 0px !important;
+}
