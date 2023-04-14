@@ -34,6 +34,9 @@ const Login = () => {
         setShowOTP(true);
       }
     } catch (error) {
+      if (!error.response.data.success) {
+        toast.error(error.response.data.message);
+      }
       console.log(error);
     }
   };

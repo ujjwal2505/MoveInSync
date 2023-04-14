@@ -13,6 +13,23 @@ app.use(express.urlencoded({ extended: true }));
 /*                                 twilio API                                 */
 /* -------------------------------------------------------------------------- */
 
+const spreadsheetId = process.env.DATABASE_ID;
+
+function getAuth() {
+  const auth = new google.auth.GoogleAuth({
+    keyFile: "credentials.json",
+    scopes: "https://www.googleapis.com/auth/spreadsheets",
+  });
+  return auth;
+}
+
+/* ----------------------- Proccure Google Sheet method ---------------------- */
+async function getGoogleSheet(auth) {
+  const client = await auth.getClient();
+  const googleSheet = google.sheets({ version: "v4", auth: client });
+  return googleSheet;
+}
+
 const client = require("twilio")(
   process.env.ACCOUNT_SID,
   process.env.AUTH_TOKEN
@@ -32,6 +49,35 @@ app.post("/api/getcode", async (req, res) => {
     //     message: `OTP SENT to ${req.body.phoneNo}`,
     //   });
     // }
+
+    const auth = getAuth();
+    const googleSheet = await getGoogleSheet(auth);
+
+    const getMetaData = await googleSheet.spreadsheets.get({
+      auth,
+      spreadsheetId,
+    });
+
+    const getSheetData = await googleSheet.spreadsheets.values.get({
+      auth,
+      spreadsheetId,
+      //   range: 'Sheet1!A2:B',
+      range: "Sheet1!A2:A",
+    });
+    const cols = getSheetData.data.values;
+
+    let numberExsits = cols.some((el) => {
+      console.log(req.body.phoneNo, el);
+      return el[0] === req.body.phoneNo;
+    });
+
+    if (!numberExsits) {
+      return res.status(404).json({
+        success: false,
+        message: `Number not registered`,
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: `OTP SENT to ${req.body.phoneNo}`,
@@ -88,23 +134,6 @@ app.post("/api/verifycode", async (req, res) => {
 /* -------------------------------------------------------------------------- */
 /*                           crud for google sheets                           */
 /* -------------------------------------------------------------------------- */
-
-const spreadsheetId = process.env.DATABASE_ID;
-
-function getAuth() {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: "credentials.json",
-    scopes: "https://www.googleapis.com/auth/spreadsheets",
-  });
-  return auth;
-}
-
-/* ----------------------- Proccure Google Sheet method ---------------------- */
-async function getGoogleSheet(auth) {
-  const client = await auth.getClient();
-  const googleSheet = google.sheets({ version: "v4", auth: client });
-  return googleSheet;
-}
 
 /* ----------------------- GET Google Sheet method ---------------------- */
 

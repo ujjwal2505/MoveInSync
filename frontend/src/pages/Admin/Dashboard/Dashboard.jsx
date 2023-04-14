@@ -127,15 +127,16 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1
-        className="dashboard_heading"
-        onClick={() => setFilteredData(carData)}
-      >
-        Welcome
-      </h1>
+      <h1 className="dashboard_heading">Welcome</h1>
       {/* <div className="company_name">SRS Travels</div> */}
 
       <div className="dashboard_stats_container">
+        <div
+          className="dashboard_stats_card"
+          onClick={() => setFilteredData(carData)}
+        >
+          Total Car: {carData.length}
+        </div>
         <div
           className="dashboard_stats_card"
           onClick={() => handleFilter("activeCar")}

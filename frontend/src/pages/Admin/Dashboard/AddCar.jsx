@@ -15,7 +15,7 @@ import DialogContent from "@mui/material/DialogContent";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
-import { redirect, useNavigate } from "react-router-dom";
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -36,12 +36,13 @@ const AddCar = ({ setShowEditCar, showEditCar, handleFormSubmit }) => {
   } = useContext(CarContext);
 
   const [isError, setIsError] = useState({
-    registartionNo: false,
-    driverName: false,
-    driverPhoneNo: false,
+    registartionNo: { status: false, text: "" },
+    driverName: { status: false, text: "" },
+    driverPhoneNo: { status: false, text: "" },
   });
 
   const handleChange = (key, value) => {
+    setIsError({ ...isError, [key]: { status: false, text: "" } });
     if (key == "active") {
       setFields({
         ...fields,
@@ -54,7 +55,6 @@ const AddCar = ({ setShowEditCar, showEditCar, handleFormSubmit }) => {
       ...fields,
       [key]: value,
     });
-    setIsError({ ...isError, [key]: false });
   };
 
   const handleLocation = (val) => {
@@ -62,34 +62,20 @@ const AddCar = ({ setShowEditCar, showEditCar, handleFormSubmit }) => {
   };
 
   const checkError = () => {
-    let flag = false;
-    let registartionRegex =
-      /^[A-Z]{2}[ -][0-9]{1,2}[ -](?:[A-Z])?(?:[A-Z]*)?[ -][0-9]{4}$/;
-    let phoneRegex = /^\d{10}$/;
-
     if (
-      !fields.registartionNo ||
-      !registartionRegex.test(fields.registartionNo)
+      Object.values(isError).some((el) => el.status === true) ||
+      Object.values(endGarageLocation).some((el) => el == "") ||
+      Object.values(startGarageLocation).some((el) => el == "") ||
+      Object.values(fields).some((el) => el === "")
     ) {
-      setIsError({ ...isError, registartionNo: true });
-      flag = true;
-    } else if (!fields.driverName) {
-      setIsError({ ...isError, driverName: true });
-      flag = true;
-    } else if (
-      !fields.driverPhoneNo ||
-      !phoneRegex.test(fields.driverPhoneNo)
-    ) {
-      setIsError({ ...isError, driverPhoneNo: true });
-      flag = true;
+      return true;
     }
 
-    return flag;
+    return false;
   };
 
   const handleSubmit = () => {
-    let error = checkError();
-    if (error) {
+    if (checkError()) {
       return;
     }
 
@@ -110,6 +96,49 @@ const AddCar = ({ setShowEditCar, showEditCar, handleFormSubmit }) => {
     });
   };
 
+  const handleBlur = async (key) => {
+    let registartionRegex =
+      /^[A-Z]{2}[ -][0-9]{1,2}[ -](?:[A-Z])?(?:[A-Z]*)?[ -][0-9]{4}$/;
+    let phoneRegex = /^\d{10}$/;
+
+    if (key === "registartionNo") {
+      if (
+        !fields.registartionNo ||
+        !registartionRegex.test(fields.registartionNo)
+      ) {
+        setIsError({
+          ...isError,
+          registartionNo: { status: true, text: "Incorrect Format" },
+        });
+      } else {
+        const res = await axios.get("/api/getSheetData");
+
+        if (
+          res.data.data.some(
+            (el) => el.registartionNo === fields.registartionNo
+          )
+        ) {
+          setIsError({
+            ...isError,
+            registartionNo: { status: true, text: "Already Exists" },
+          });
+        }
+      }
+    } else if (key === "driverName" && !fields.driverName) {
+      setIsError({
+        ...isError,
+        driverName: { status: true, text: "Required" },
+      });
+    } else if (
+      key === "driverPhoneNo" &&
+      (!fields.driverPhoneNo || !phoneRegex.test(fields.driverPhoneNo))
+    ) {
+      setIsError({
+        ...isError,
+        driverPhoneNo: { status: true, text: "Incorrect Format" },
+      });
+    }
+  };
   console.log(isError, fields);
 
   return (
@@ -133,8 +162,10 @@ const AddCar = ({ setShowEditCar, showEditCar, handleFormSubmit }) => {
             placeholder="XX-00-XX-0000"
             variant="outlined"
             onChange={(e) => handleChange("registartionNo", e.target.value)}
+            onBlur={() => handleBlur("registartionNo")}
             value={fields.registartionNo}
-            error={isError.registartionNo}
+            error={isError.registartionNo.status}
+            helperText={isError.registartionNo.text}
           />
         )}
         <TextField
@@ -142,15 +173,19 @@ const AddCar = ({ setShowEditCar, showEditCar, handleFormSubmit }) => {
           // placeholder="XX-00-XX-0000"
           variant="outlined"
           onChange={(e) => handleChange("driverName", e.target.value)}
+          onBlur={() => handleBlur("driverName")}
           value={fields.driverName}
-          error={isError.driverName}
+          error={isError.driverName.status}
+          helperText={isError.driverName.text}
         />
         <TextField
           label="Phone No"
           variant="outlined"
           onChange={(e) => handleChange("driverPhoneNo", e.target.value)}
+          onBlur={() => handleBlur("driverPhoneNo")}
           value={fields.driverPhoneNo}
-          error={isError.driverPhoneNo}
+          error={isError.driverPhoneNo.status}
+          helperText={isError.driverPhoneNo.text}
         />
 
         <CustomTimePicker
