@@ -103,7 +103,10 @@ const DashboardTable = ({ carData, setShowEditCar }) => {
                     className="pointer"
                     onClick={() => openMapByCoordiates(row.startGarageLocation)}
                   >
-                    {`${row.startGarageLocation.lat} , ${row.startGarageLocation.lng}`}
+                    {!!row.startGarageLocation?.lat &&
+                    !!row.startGarageLocation?.lng
+                      ? `${row.startGarageLocation.lat} , ${row.startGarageLocation.lng}`
+                      : ""}
                   </TableCell>
                 </Tooltip>
 
@@ -112,15 +115,19 @@ const DashboardTable = ({ carData, setShowEditCar }) => {
                     className="pointer"
                     onClick={() => openMapByCoordiates(row.endGarageLocation)}
                   >
-                    {`${row.endGarageLocation.lat} , ${row.endGarageLocation.lng}`}
+                    {!!row.endGarageLocation?.lat &&
+                    !!row.endGarageLocation?.lng
+                      ? `${row.endGarageLocation.lat} , ${row.endGarageLocation.lng}`
+                      : ""}
                   </TableCell>
                 </Tooltip>
 
                 <TableCell>
-                  {moment(row.shiftStartTime).format("HH:mm")}
+                  {row.shiftStartTime &&
+                    moment(row.shiftStartTime).format("HH:mm")}
                 </TableCell>
                 <TableCell>
-                  {moment(row.shiftEndTime).format("HH:mm")}
+                  {row.shiftEndTime && moment(row.shiftEndTime).format("HH:mm")}
                 </TableCell>
               </TableRow>
             );

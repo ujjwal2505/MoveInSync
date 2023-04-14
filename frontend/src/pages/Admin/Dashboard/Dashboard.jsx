@@ -135,25 +135,25 @@ const Dashboard = () => {
           className="dashboard_stats_card"
           onClick={() => setFilteredData(carData)}
         >
-          Total Car: {carData.length}
+          Total: {carData.length}
         </div>
         <div
           className="dashboard_stats_card"
           onClick={() => handleFilter("activeCar")}
         >
-          Active Car: {stats.activeCars}
+          Active: {stats.activeCars}
         </div>
         <div
           className="dashboard_stats_card"
           onClick={() => handleFilter("currentlyActiveCar")}
         >
-          Currently Running Car: {stats.currentlyActive}
+          Current: {stats.currentlyActive}
         </div>
         <div
           className="dashboard_stats_card"
           onClick={() => handleFilter("incomplete")}
         >
-          Incomplete Data: {stats.incomplete}
+          Incomplete: {stats.incomplete}
         </div>
       </div>
 
