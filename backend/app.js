@@ -62,7 +62,7 @@ app.post("/api/getcode", async (req, res) => {
       auth,
       spreadsheetId,
       //   range: 'Sheet1!A2:B',
-      range: "Sheet1!A2:A",
+      range: "Sheet1!I2:I",
     });
     const cols = getSheetData.data.values;
 
@@ -141,11 +141,6 @@ app.get("/api/getSheetData", async (req, res) => {
   const auth = getAuth();
   const googleSheet = await getGoogleSheet(auth);
 
-  const getMetaData = await googleSheet.spreadsheets.get({
-    auth,
-    spreadsheetId,
-  });
-
   const getSheetData = await googleSheet.spreadsheets.values.get({
     auth,
     spreadsheetId,
@@ -156,14 +151,15 @@ app.get("/api/getSheetData", async (req, res) => {
   const rows = getSheetData.data.values;
   const headers = rows.shift();
   let data = [];
+
   data = rows.map((row, idx) => {
     const obj = {};
     headers.forEach((header, index) => {
       if (header === "active") {
         obj[header] = row[index] === "TRUE";
       } else if (
-        header == "startGarageLocation" ||
-        header == "endGarageLocation"
+        header === "startGarageLocation" ||
+        header === "endGarageLocation"
       ) {
         obj[header] = row[index] === "" ? "" : JSON.parse(row[index]);
       } else {
@@ -175,13 +171,13 @@ app.get("/api/getSheetData", async (req, res) => {
     return obj;
   });
 
+  console.log("arr of obj", data);
+
   data = data.filter((row) => row.uuid == req.headers.userid);
-  console.log(data);
-  //   console.log(data);
 
   res.status(200).json({
     success: true,
-    metaData: getMetaData,
+    // metaData: getMetaData,
     data,
   });
 });
@@ -210,7 +206,6 @@ app.post("/api/postSheetData", async (req, res) => {
     resource: {
       values: [
         [
-          req.headers.userid,
           registartionNo,
           JSON.stringify(startGarageLocation),
           JSON.stringify(endGarageLocation),
@@ -219,6 +214,7 @@ app.post("/api/postSheetData", async (req, res) => {
           active,
           driverName,
           driverPhoneNo,
+          req.headers.userid,
         ],
       ],
     },
@@ -256,7 +252,6 @@ app.post("/api/updateSheetData", async (req, res) => {
     resource: {
       values: [
         [
-          req.headers.userid,
           registartionNo,
           JSON.stringify(startGarageLocation),
           JSON.stringify(endGarageLocation),
@@ -265,6 +260,7 @@ app.post("/api/updateSheetData", async (req, res) => {
           active,
           driverName,
           driverPhoneNo,
+          req.headers.userid,
         ],
       ],
     },
